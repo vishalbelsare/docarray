@@ -1,51 +1,19 @@
-import numpy as np
+# Licensed to the LF AI & Data foundation under one
+# or more contributor license agreements. See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership. The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+from pathlib import Path
 
-from docarray import DocumentArray, Document
-
-
-def random_docs(
-    num_docs,
-    chunks_per_doc=5,
-    embed_dim=10,
-    jitter=1,
-    start_id=0,
-    embedding=True,
-    sparse_embedding=False,
-    text='hello world',
-) -> DocumentArray:
-    da = DocumentArray()
-    next_chunk_doc_id = start_id + num_docs
-    for j in range(num_docs):
-        doc_id = str(start_id + j)
-
-        d = Document(id=doc_id)
-        d.text = text
-        d.tags['id'] = f'myself id is: {doc_id}'
-        if embedding:
-            if sparse_embedding:
-                from scipy.sparse import coo_matrix
-
-                d.embedding = coo_matrix(
-                    (np.array([1, 1, 1]), (np.array([0, 1, 2]), np.array([1, 2, 1])))
-                )
-            else:
-                d.embedding = np.random.random(
-                    [embed_dim + np.random.randint(0, jitter)]
-                )
-
-        for _ in range(chunks_per_doc):
-            chunk_doc_id = str(next_chunk_doc_id)
-
-            c = Document(id=chunk_doc_id)
-            c.text = 'i\'m chunk %s from doc %s' % (chunk_doc_id, doc_id)
-            if embedding:
-                c.embedding = np.random.random(
-                    [embed_dim + np.random.randint(0, jitter)]
-                )
-            c.tags['parent_id'] = f'my parent is: {id}'
-            c.tags['id'] = f'myself id is: {doc_id}'
-            d.chunks.append(c)
-            next_chunk_doc_id += 1
-
-        da.append(d)
-    return da
+REPO_ROOT_DIR = Path(__file__).parent.parent.absolute()
+TOYDATA_DIR = REPO_ROOT_DIR / 'tests' / 'toydata'
